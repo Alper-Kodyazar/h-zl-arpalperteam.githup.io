@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hızlı Çarp</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-weight: bold;
+            font-style: italic;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        h1 {
+            background-color: #007BFF;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+            border-radius: 5px;
+        }
+        #game, #scoreboard {
+            display: none;
+            background: #1e1e1e;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+        }
+        #questionDisplay {
+            font-size: 28px;
+            margin: 20px 0;
+            font-weight: bold;
+            font-style: italic;
+            color: #66B2FF;
+        }
+        #timer {
+            font-size: 20px;
+            color: #ff3d00;
+        }
+        #inputField {
+            font-size: 18px;
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            border: 2px solid #007BFF;
+            border-radius: 5px;
+            text-align: center;
+            background: #333;
+            color: #fff;
+        }
+        button {
+            background-color: #007BFF;
+            color: #ffffff;
+            font-size: 18px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #highScores {
+            list-style: none;
+            padding: 0;
+        }
+        #highScores li {
+            background: #66B2FF;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            color: #121212;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hızlı Çarp</h1>
+    <p>Lütfen isminizi girin:</p>
+    <input type="text" id="nameInput" placeholder="İsminiz">
+    <button onclick="startGame()">Başla</button>
+
+    <div id="game">
+        <p id="timer">Süre: 60</p>
+        <p id="questionDisplay"></p>
+        <input type="number" id="inputField" placeholder="Sonucu yazın">
+        <p>Skor: <span id="score">0</span></p>
+    </div>
+
+    <div id="scoreboard">
+        <h2>Skor Tablosu</h2>
+        <ul id="highScores"></ul>
+        <button onclick="restartGame()">Yeniden Oyna</button>
+    </div>
+
+    <audio id="backgroundMusic" autoplay loop>
+        <source src="maNga - Bir Kadın Çizeceksin Orijinal Karaoke (Orijinal Instrumental).mp3" type="audio/mpeg">
+        Tarayıcınız bu ses formatını desteklemiyor.
+    </audio>
+    
+    <script>
+        let score = 0;
+        let timeLeft = 60;
+        let correctAnswer = 0;
+        let highScores = [];
+        let timer;
+
+        const questionDisplay = document.getElementById("questionDisplay");
+        const inputField = document.getElementById("inputField");
+        const scoreDisplay = document.getElementById("score");
+        const timerDisplay = document.getElementById("timer");
+        const game = document.getElementById("game");
+        const scoreboard = document.getElementById("scoreboard");
+        const highScoresList = document.getElementById("highScores");
+
+        function generateQuestion() {
+            let num1 = Math.floor(Math.random() * 10) + 1;
+            let num2 = Math.floor(Math.random() * 10) + 1;
+            correctAnswer = num1 * num2;
+            questionDisplay.textContent = `${num1} × ${num2} = ?`;
+        }
+
+        function updateScore() {
+            score += 3;
+            scoreDisplay.textContent = score;
+        }
+
+        function updateHighScores(playerName) {
+            highScores.push({ name: playerName, score: score });
+            highScores.sort((a, b) => b.score - a.score);
+            highScoresList.innerHTML = "";
+            highScores.slice(0, 10).forEach((highScore, index) => {
+                const li = document.createElement("li");
+                li.textContent = `${index + 1}. ${highScore.name}: ${highScore.score}`;
+                highScoresList.appendChild(li);
+            });
+        }
+
+        function startGame() {
+            playerName = document.getElementById("nameInput").value;
+            if (playerName === "") {
+                alert("Lütfen bir isim girin!");
+                return;
+            }
+            game.style.display = "block";
+            score = 0;
+            timeLeft = 60;
+            scoreDisplay.textContent = score;
+            generateQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = `Süre: ${timeLeft}`;
+                if (timeLeft === 0) {
+                    clearInterval(timer);
+                    inputField.disabled = true;
+                    game.style.display = "none";
+                    scoreboard.style.display = "block";
+                    updateHighScores(playerName);
+                }
+            }, 1000);
+        }
+
+        inputField.addEventListener("input", function () {
+            if (parseInt(inputField.value) === correctAnswer) {
+                updateScore();
+                generateQuestion();
+                inputField.value = "";
+            }
+        });
+
+        function restartGame() {
+            inputField.disabled = false;
+            inputField.value = "";
+            scoreboard.style.display = "none";
+            startGame();
+        }
+    </script>
+</body>
+</html>
+
+
+
+
