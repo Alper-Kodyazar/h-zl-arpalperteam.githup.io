@@ -79,22 +79,6 @@
             border-radius: 5px;
             color: #121212;
         }
-        #numpad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 200px;
-            margin: 10px auto;
-        }
-        .numpad-btn {
-            font-size: 20px;
-            padding: 10px;
-            background-color: #007BFF;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -107,8 +91,6 @@
         <p id="timer">Süre: 60</p>
         <p id="questionDisplay"></p>
         <input type="number" id="inputField" placeholder="Sonucu yazın">
-        <button onclick="toggleNumpad()">Klavye Aç</button>
-        <div id="numpad" style="display: none;"></div>
         <p>Skor: <span id="score">0</span></p>
     </div>
 
@@ -118,6 +100,11 @@
         <button onclick="restartGame()">Yeniden Oyna</button>
     </div>
 
+    <audio id="backgroundMusic" autoplay loop>
+        <source src="maNga - Bir Kadın Çizeceksin Orijinal Karaoke (Orijinal Instrumental).mp3" type="audio/mpeg">
+        Tarayıcınız bu ses formatını desteklemiyor.
+    </audio>
+    
     <script>
         let score = 0;
         let timeLeft = 60;
@@ -132,7 +119,6 @@
         const game = document.getElementById("game");
         const scoreboard = document.getElementById("scoreboard");
         const highScoresList = document.getElementById("highScores");
-        const numpad = document.getElementById("numpad");
 
         function generateQuestion() {
             let num1 = Math.floor(Math.random() * 10) + 1;
@@ -144,6 +130,17 @@
         function updateScore() {
             score += 3;
             scoreDisplay.textContent = score;
+        }
+
+        function updateHighScores(playerName) {
+            highScores.push({ name: playerName, score: score });
+            highScores.sort((a, b) => b.score - a.score);
+            highScoresList.innerHTML = "";
+            highScores.slice(0, 10).forEach((highScore, index) => {
+                const li = document.createElement("li");
+                li.textContent = `${index + 1}. ${highScore.name}: ${highScore.score}`;
+                highScoresList.appendChild(li);
+            });
         }
 
         function startGame() {
@@ -169,20 +166,24 @@
                     inputField.disabled = true;
                     game.style.display = "none";
                     scoreboard.style.display = "block";
+                    updateHighScores(playerName);
                 }
             }, 1000);
         }
 
-        function toggleNumpad() {
-            numpad.innerHTML = "";
-            numpad.style.display = numpad.style.display === "none" ? "grid" : "none";
-            for (let i = 1; i <= 9; i++) {
-                let btn = document.createElement("button");
-                btn.textContent = i;
-                btn.classList.add("numpad-btn");
-                btn.onclick = () => inputField.value += i;
-                numpad.appendChild(btn);
+        inputField.addEventListener("input", function () {
+            if (parseInt(inputField.value) === correctAnswer) {
+                updateScore();
+                generateQuestion();
+                inputField.value = "";
             }
+        });
+
+        function restartGame() {
+            inputField.disabled = false;
+            inputField.value = "";
+            scoreboard.style.display = "none";
+            startGame();
         }
     </script>
 </body>
