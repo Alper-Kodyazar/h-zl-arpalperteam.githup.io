@@ -6,9 +6,7 @@
   <title>Hızlı İşlem</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
@@ -53,9 +51,7 @@
       color: #fff;
       border: 1px solid #ffffff30;
     }
-    input::placeholder {
-      color: #ccc;
-    }
+    input::placeholder { color: #ccc; }
     button {
       background: linear-gradient(135deg, #00c6ff, #0072ff);
       color: white;
@@ -63,9 +59,7 @@
       cursor: pointer;
       transition: transform 0.2s ease;
     }
-    button:hover {
-      transform: scale(1.05);
-    }
+    button:hover { transform: scale(1.05); }
     #questionDisplay {
       font-size: 28px;
       color: #66B2FF;
@@ -88,12 +82,8 @@
       color: #fff;
     }
     @media (max-width: 480px) {
-      h1 {
-        font-size: 30px;
-      }
-      .card {
-        padding: 20px;
-      }
+      h1 { font-size: 30px; }
+      .card { padding: 20px; }
     }
   </style>
 </head>
@@ -117,8 +107,13 @@
   <button onclick="startGame()">Başla</button>
 </div>
 
+<div id="scoreboardStart" class="card">
+  <h2>Liderlik Tablosu</h2>
+  <ul id="startHighScores"></ul>
+</div>
+
 <div id="game" class="card" style="display:none;">
-  <p id="timer">Süre: 60</p>
+  <p id="timer">Süre: 30</p>
   <div id="questionDisplay"></div>
   <input type="number" id="inputField" placeholder="Cevap">
   <p>Skor: <span id="score">0</span></p>
@@ -133,7 +128,7 @@
 <script>
   let playerName = "";
   let score = 0;
-  let timeLeft = 60;
+  let timeLeft = 30;
   let correctAnswer = 0;
   let timer;
   let highScores = JSON.parse(localStorage.getItem("highScores") || "[]");
@@ -145,6 +140,16 @@
   const game = document.getElementById("game");
   const scoreboard = document.getElementById("scoreboard");
   const highScoresList = document.getElementById("highScores");
+  const startHighScoresList = document.getElementById("startHighScores");
+
+  function renderStartScores() {
+    startHighScoresList.innerHTML = "";
+    highScores.forEach((hs, i) => {
+      const li = document.createElement("li");
+      li.textContent = `${i + 1}. ${hs.name}: ${hs.score}`;
+      startHighScoresList.appendChild(li);
+    });
+  }
 
   function getMaxNumber(difficulty) {
     switch (difficulty) {
@@ -160,7 +165,6 @@
     const max = getMaxNumber(difficulty);
     let num1 = Math.floor(Math.random() * max) + 1;
     let num2 = Math.floor(Math.random() * max) + 1;
-
     let op = operation === "random" ? ["add", "subtract", "multiply"][Math.floor(Math.random() * 3)] : operation;
 
     switch (op) {
@@ -190,6 +194,7 @@
     highScores.sort((a, b) => b.score - a.score);
     highScores = highScores.slice(0, 10);
     localStorage.setItem("highScores", JSON.stringify(highScores));
+    renderStartScores();
     highScoresList.innerHTML = "";
     highScores.forEach((hs, i) => {
       const li = document.createElement("li");
@@ -205,9 +210,10 @@
       return;
     }
     document.getElementById("settings").style.display = "none";
+    document.getElementById("scoreboardStart").style.display = "none";
     game.style.display = "block";
     score = 0;
-    timeLeft = 60;
+    timeLeft = 30;
     scoreDisplay.textContent = score;
     inputField.disabled = false;
     generateQuestion();
@@ -237,9 +243,12 @@
 
   function restartGame() {
     document.getElementById("settings").style.display = "block";
+    document.getElementById("scoreboardStart").style.display = "block";
     scoreboard.style.display = "none";
     inputField.value = "";
   }
+
+  window.onload = renderStartScores;
 </script>
 </body>
 </html>
