@@ -4,53 +4,67 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hızlı İşlem</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #121212;
-      color: #fff;
-      text-align: center;
       margin: 0;
-      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      justify-content: center;
+      padding: 20px;
     }
     h1 {
-      background: #007BFF;
-      margin: 0;
-      padding: 20px;
-      font-size: 32px;
-      border-radius: 5px;
+      font-size: 40px;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    #settings, #game, #scoreboard {
-      margin: 20px auto;
-      padding: 20px;
-      background: #1e1e1e;
-      border-radius: 10px;
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 30px;
       max-width: 400px;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      width: 100%;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      text-align: center;
+      margin: 20px 0;
     }
     input, select, button {
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
       border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: inherit;
     }
-    input[type="text"], input[type="number"] {
-      width: 80%;
-      text-align: center;
-      background: #333;
+    input, select {
+      background: #ffffff10;
       color: #fff;
-      border: 2px solid #007BFF;
+      border: 1px solid #ffffff30;
+    }
+    input::placeholder {
+      color: #ccc;
     }
     button {
-      background: #007BFF;
-      color: #fff;
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: white;
+      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
+      transition: transform 0.2s ease;
     }
     button:hover {
-      background: #0056b3;
+      transform: scale(1.05);
     }
     #questionDisplay {
       font-size: 28px;
@@ -59,15 +73,27 @@
     }
     #timer {
       font-size: 20px;
-      color: #ff3d00;
+      color: #ff6f61;
+      margin: 10px 0;
     }
-    #highScores li {
-      background: #66B2FF;
-      color: #000;
+    ul {
+      padding: 0;
+    }
+    li {
+      list-style: none;
+      background: #ffffff15;
       margin: 5px 0;
       padding: 10px;
-      border-radius: 5px;
-      list-style: none;
+      border-radius: 10px;
+      color: #fff;
+    }
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 30px;
+      }
+      .card {
+        padding: 20px;
+      }
     }
   </style>
 </head>
@@ -75,16 +101,13 @@
 
 <h1>Hızlı İşlem</h1>
 
-<div id="settings">
-  <p>İsmin:</p>
-  <input type="text" id="nameInput" placeholder="İsim gir">
-  <p>Zorluk:</p>
+<div id="settings" class="card">
+  <input type="text" id="nameInput" placeholder="İsmin">
   <select id="difficulty">
     <option value="easy">Kolay</option>
     <option value="medium">Orta</option>
     <option value="hard">Zor</option>
   </select>
-  <p>İşlem Türü:</p>
   <select id="operation">
     <option value="multiply">Çarpma</option>
     <option value="add">Toplama</option>
@@ -94,14 +117,14 @@
   <button onclick="startGame()">Başla</button>
 </div>
 
-<div id="game" style="display:none;">
+<div id="game" class="card" style="display:none;">
   <p id="timer">Süre: 60</p>
-  <p id="questionDisplay"></p>
-  <input type="number" id="inputField" placeholder="Cevabı yaz">
+  <div id="questionDisplay"></div>
+  <input type="number" id="inputField" placeholder="Cevap">
   <p>Skor: <span id="score">0</span></p>
 </div>
 
-<div id="scoreboard" style="display:none;">
+<div id="scoreboard" class="card" style="display:none;">
   <h2>Skor Tablosu</h2>
   <ul id="highScores"></ul>
   <button onclick="restartGame()">Yeniden Oyna</button>
@@ -134,16 +157,11 @@
   function generateQuestion() {
     const difficulty = document.getElementById("difficulty").value;
     const operation = document.getElementById("operation").value;
-
     const max = getMaxNumber(difficulty);
     let num1 = Math.floor(Math.random() * max) + 1;
     let num2 = Math.floor(Math.random() * max) + 1;
 
-    let op = operation;
-    if (operation === "random") {
-      const ops = ["add", "subtract", "multiply"];
-      op = ops[Math.floor(Math.random() * ops.length)];
-    }
+    let op = operation === "random" ? ["add", "subtract", "multiply"][Math.floor(Math.random() * 3)] : operation;
 
     switch (op) {
       case "add":
@@ -183,7 +201,7 @@
   function startGame() {
     playerName = document.getElementById("nameInput").value.trim();
     if (!playerName) {
-      alert("İsmini yaz be!");
+      alert("İsmini yazsana be reis!");
       return;
     }
     document.getElementById("settings").style.display = "none";
@@ -225,8 +243,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
